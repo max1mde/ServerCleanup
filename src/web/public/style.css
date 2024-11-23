@@ -4,24 +4,50 @@ body {
   background-color: #1e1e1e;
   color: #f0f0f0;
 }
+
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 h1 {
   color: #ffffff;
+  text-align: center;
 }
+
 form {
+  flex: 1;
   max-width: 500px;
-  margin: 0 auto;
   padding: 20px;
   background: #2e2e2e;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  height: 550px;
 }
+
+#console {
+  flex: 1;
+  max-width: 500px;
+  background-color: #111;
+  color: #0f0;
+  padding: 20px;
+  border-radius: 8px;
+  height: 550px;
+  overflow-y: auto;
+  font-family: monospace;
+  border: 1px solid #333;
+}
+
 label {
   display: block;
   margin-bottom: 5px;
   color: #ccc;
 }
-input,
-button {
+
+input {
   width: 100%;
   padding: 8px;
   margin-bottom: 15px;
@@ -30,23 +56,46 @@ button {
   background-color: #1e1e1e;
   color: #f0f0f0;
 }
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
+
+select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #1e1e1e;
+  color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  appearance: none;
   cursor: pointer;
 }
-button:hover {
-  background-color: #0056b3;
+
+select:hover {
+  border-color: #555;
 }
-#console {
-  margin-top: 20px;
-  background-color: #111;
-  color: #0f0;
-  padding: 10px;
-  border-radius: 5px;
-  height: 200px;
-  overflow-y: auto;
-  font-family: monospace;
-  border: 1px solid #333;
+
+select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+select option {
+  background-color: #2e2e2e;
+  color: #f0f0f0;
+}
+
+select {
+  background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f0f0f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"%3E%3Cpolyline points="6 9 12 15 18 9"%3E%3C/polyline%3E%3C/svg%3E');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px 16px;
+  padding-right: 30px;
+}
+
+button[type="button"] {
+  background-color: #dc3545;
+}
+
+button[type="button"]:hover {
+  background-color: #bb2d3b;
 }

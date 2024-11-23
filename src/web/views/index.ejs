@@ -3,41 +3,147 @@
   <head>
     <title>Discord Cleanup Bot</title>
     <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/background.css" />
+    <link rel="stylesheet" href="/button.css" />
   </head>
   <body>
+    <!-- Animated Background -->
+    <canvas class="animatedcanvas" id="2dcanvas"></canvas>
+
     <h1>Discord Cleanup Bot</h1>
-    <form method="POST" action="/execute">
-      <label for="token">Discord Token:</label>
-      <input type="text" id="token" name="token" required />
+    <div class="container">
+      <form id="cleanupForm">
+        <label for="token">Discord Token:</label>
+        <input type="text" id="token" name="token" required />
 
-      <label for="userId">User ID (optional):</label>
-      <input type="text" id="userId" name="userId" />
+        <label for="guild">Select Guild:</label>
+        <select id="guild" name="guild" required>
+          <option value="">-- Select a Guild --</option>
+        </select>
 
-      <label for="contentFilter">Content Filter (optional):</label>
-      <input type="text" id="contentFilter" name="contentFilter" />
+        <label for="channel">Select Channel (optional):</label>
+        <select id="channel" name="channel">
+          <option value="">-- Select a Channel --</option>
+        </select>
 
-      <label for="delay">Delay (seconds):</label>
-      <input type="number" id="delay" name="delay" value="2" required />
+        <label for="userId">User ID (optional):</label>
+        <input type="text" id="userId" name="userId" />
 
-      <label for="limit">Limit:</label>
-      <input type="number" id="limit" name="limit" value="100" required />
+        <label for="contentFilter">Content Filter (optional):</label>
+        <input type="text" id="contentFilter" name="contentFilter" />
 
-      <button type="submit">Execute</button>
-    </form>
+        <label for="delay">Delay (seconds):</label>
+        <input type="number" id="delay" name="delay" value="2" required />
 
-    <div id="console">Output...</div>
+        <label for="limit">Limit:</label>
+        <input type="number" id="limit" name="limit" value="100" required />
+
+        <div class="button-container">
+          <button type="submit" id="exBtn" class="liquid-button">
+            <span>Execute Deletion Task</span>
+            <div class="liquid"></div>
+          </button>
+          <button
+            type="submit"
+            id="cancelBtn"
+            class="liquid-button cancel-btn"
+            style="display: none">
+            <span>Cancel</span>
+            <div class="liquid"></div>
+          </button>
+        </div>
+      </form>
+      <div id="console">Output...</div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      let currentClient = null;
       const socket = io();
       const consoleDiv = document.getElementById("console");
+      const tokenInput = document.getElementById("token");
+      const guildSelect = document.getElementById("guild");
+      const channelSelect = document.getElementById("channel");
+      const form = document.getElementById("cleanupForm");
+      const exBtn = document.getElementById("exBtn");
+      const cancelBtn = document.getElementById("cancelBtn");
 
-      socket.on("log", (message) => {
+      cancelBtn.addEventListener("click", () => {
+        socket.emit("cancelCleanup");
+
+        cancelBtn.style.display = "none";
+        exBtn.style.display = "block";
+      });
+
+      function resetDropdowns() {
+        guildSelect.innerHTML =
+          '<option value="">-- Select a Guild --</option>';
+        channelSelect.innerHTML =
+          '<option value="">-- Select a Channel --</option>';
+      }
+
+      function logToConsole(message) {
         const logEntry = document.createElement("div");
         logEntry.textContent = message;
         consoleDiv.appendChild(logEntry);
         consoleDiv.scrollTop = consoleDiv.scrollHeight;
+      }
+
+      tokenInput.addEventListener("input", async () => {
+        const token = tokenInput.value.trim();
+        if (token) {
+          logToConsole("Logging in to Discord...");
+          socket.emit("initializeClient", { token });
+        }
       });
+
+      guildSelect.addEventListener("change", () => {
+        const guildId = guildSelect.value;
+        if (guildId) {
+          socket.emit("fetchChannels", { guildId });
+        }
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        cancelBtn.style.display = "block";
+        exBtn.style.display = "none";
+
+        socket.emit("startCleanup", data);
+      });
+
+      socket.on("guilds", (guilds) => {
+        resetDropdowns();
+        guilds.forEach((guild) => {
+          const option = document.createElement("option");
+          option.value = guild.id;
+          option.textContent = guild.name;
+          guildSelect.appendChild(option);
+        });
+      });
+
+      socket.on("cleanupComplete", () => {
+        form.querySelector('button[type="submit"]').style.display = "block";
+        cancelBtn.style.display = "none";
+        exBtn.style.display = "block";
+      });
+
+      socket.on("channels", (channels) => {
+        channelSelect.innerHTML =
+          '<option value="">-- Select a Channel --</option>';
+        channels.forEach((channel) => {
+          const option = document.createElement("option");
+          option.value = channel.id;
+          option.textContent = channel.name;
+          channelSelect.appendChild(option);
+        });
+      });
+
+      socket.on("log", logToConsole);
     </script>
+    <script src="/background.js"></script>
   </body>
 </html>
