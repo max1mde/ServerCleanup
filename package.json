@@ -4,8 +4,14 @@
   "description": "Cleanup any Discord server using this tool",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js"
   },
   "author": "MaximDe",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "discord.js-selfbot-v13": "^3.4.2",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1"
+  }
 }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Discord Cleanup Bot</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h1>Discord Cleanup Bot</h1>
+    <form method="POST" action="/execute">
+      <label for="token">Discord Token:</label>
+      <input type="text" id="token" name="token" required />
+
+      <label for="userId">User ID (optional):</label>
+      <input type="text" id="userId" name="userId" />
+
+      <label for="contentFilter">Content Filter (optional):</label>
+      <input type="text" id="contentFilter" name="contentFilter" />
+
+      <label for="delay">Delay (seconds):</label>
+      <input type="number" id="delay" name="delay" value="2" required />
+
+      <label for="limit">Limit:</label>
+      <input type="number" id="limit" name="limit" value="100" required />
+
+      <button type="submit">Execute</button>
+    </form>
+    <% if (message) { %>
+    <p><%= message %></p>
+    <% } %>
+  </body>
+</html>
