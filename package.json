@@ -1,0 +1,11 @@
+{
+  "name": "cleanup",
+  "version": "1.0.0",
+  "description": "Cleanup any Discord server using this tool",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "MaximDe",
+  "license": "MIT"
+}
