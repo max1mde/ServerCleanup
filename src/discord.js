@@ -75,7 +75,7 @@ class DiscordClient {
           logTime: this.formatLogTime(),
         });
 
-        const randomizedDelay = delay + (Math.random() * 1000 - 500);
+        const randomizedDelay = delay + Math.random() * 1000;
         await new Promise((resolve) => setTimeout(resolve, randomizedDelay));
       } catch (err) {
         onDelete({
