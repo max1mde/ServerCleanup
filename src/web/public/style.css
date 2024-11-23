@@ -91,3 +91,17 @@ select {
   background-size: 16px 16px;
   padding-right: 30px;
 }
+
+.button-container {
+  text-align: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+}
+
+.liquid-button {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
