@@ -20,5 +20,5 @@
 
 ## Credits
 
-Background - [Copyright (c) 2024 by k0miker](https://codepen.io/k0miker/pen/wvLoevE)
+Background - [Copyright (c) 2024 by k0miker](https://codepen.io/k0miker/pen/wvLoevE)  
 Button - [Copyright (c) 2024 by Short Code](https://codepen.io/ShortCode/pen/oNdBKxo)
