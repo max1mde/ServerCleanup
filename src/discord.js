@@ -22,8 +22,16 @@ class DiscordClient {
         .slice(0, limit);
 
       for (const message of filtered) {
-        await message.delete();
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        try {
+          await message.delete();
+          console.log(
+            `Deleted message from ${message.author.tag}: "${message.content}"`
+          );
+          const randomizedDelay = delay + (Math.random() * 4000 - 2000); // ±2 seconds
+          await new Promise((resolve) => setTimeout(resolve, randomizedDelay));
+        } catch (err) {
+          console.error(`Failed to delete message: ${err.message}`);
+        }
       }
     }
   }
