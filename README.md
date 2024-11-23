@@ -16,7 +16,7 @@
 5. [Obtain the token](https://linuxhint.com/get-discord-token/) of your Discord account
 6. Paste the token into the input field at the top
 
-![image](https://github.com/user-attachments/assets/d62546b5-3b2d-4930-855a-900ddbd5b73f)
+![image](https://github.com/user-attachments/assets/367ca11d-a2b8-4bbd-9f5f-333a89061c74)
 
 ## Credits
 
