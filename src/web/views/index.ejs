@@ -24,8 +24,20 @@
 
       <button type="submit">Execute</button>
     </form>
-    <% if (message) { %>
-    <p><%= message %></p>
-    <% } %>
+
+    <div id="console">Output...</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const consoleDiv = document.getElementById("console");
+
+      socket.on("log", (message) => {
+        const logEntry = document.createElement("div");
+        logEntry.textContent = message;
+        consoleDiv.appendChild(logEntry);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+      });
+    </script>
   </body>
 </html>
