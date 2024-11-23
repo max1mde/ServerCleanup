@@ -59,7 +59,7 @@ function setupWeb(app) {
         const channels = guild.channels.cache
           .filter((channel) => channel.type === "GUILD_TEXT")
           .map((channel) => ({
-            id: channel.id,(())
+            id: channel.id,
             name: channel.name,
           }));
 

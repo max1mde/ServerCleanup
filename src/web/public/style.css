@@ -91,11 +91,3 @@ select {
   background-size: 16px 16px;
   padding-right: 30px;
 }
-
-button[type="button"] {
-  background-color: #dc3545;
-}
-
-button[type="button"]:hover {
-  background-color: #bb2d3b;
-}
