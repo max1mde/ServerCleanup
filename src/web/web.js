@@ -75,54 +75,65 @@ function setupWeb(app) {
 
         socket.emit(
           "log",
-          `${currentClient.formatLogTime()} [Starting cleanup...]`
+          `${currentClient.formatLogTime()} [Starting message fetch...]`
         );
 
-        const result = await currentClient.deleteMessages({
-          userId: data.userId,
-          contentFilter: data.contentFilter,
-          delay: parseInt(data.delay) * 1000,
-          limit: parseInt(data.limit),
-          guildId: data.guild,
-          channelId: data.channel,
-          onDelete: (deleteResult) => {
-            if (deleteResult.success) {
-              socket.emit(
-                "log",
-                `${deleteResult.logTime} [#${deleteResult.channelName}]  [By ${deleteResult.author}] "${deleteResult.content}"`
-              );
-            } else {
-              socket.emit(
-                "log",
-                `${deleteResult.logTime} [#${deleteResult.channelName}] [Error] [By ${deleteResult.author}] "${deleteResult.content}" - ${deleteResult.error}`
-              );
-            }
-          },
-        });
+        const messages = await currentClient.getAllMessages(
+          currentClient.client.guilds.cache.get(data.guild),
+          data.channel,
+          data.userId,
+          data.contentFilter,
+          (fetchLog) => {
+            socket.emit("log", `${currentClient.formatLogTime()} ${fetchLog}`);
+          }
+        );
 
-        if (result.type === "info") {
-          socket.emit(
-            "log",
-            `${currentClient.formatLogTime()} [Info] ${result.message}`
-          );
-        } else if (result.type === "cancelled") {
-          socket.emit(
-            "log",
-            `${currentClient.formatLogTime()} [Cleanup cancelled]`
-          );
+        if (!currentClient.isFetching) {
+          socket.emit("cleanupComplete");
+          return;
         }
 
-        socket.emit("cleanupComplete");
-        socket.emit(
-          "log",
-          `${currentClient.formatLogTime()} [Cleanup complete]`
-        );
+        socket.emit("fetchComplete", { messageCount: messages.length });
+
+
+        socket.on("startDeleting", async () => {
+          const result = await currentClient.deleteMessages({
+            messages: messages.slice(0, parseInt(data.limit)),
+            onDelete: (deleteResult) => {
+              if (deleteResult.success) {
+                socket.emit(
+                  "log",
+                  `${deleteResult.logTime} [#${deleteResult.channelName}] [By ${deleteResult.author}] "${deleteResult.content}"`
+                );
+              } else {
+                socket.emit(
+                  "log",
+                  `${deleteResult.logTime} [#${deleteResult.channelName}] [Error] [By ${deleteResult.author}] "${deleteResult.content}" - ${deleteResult.error}`
+                );
+              }
+            },
+          });
+
+          socket.emit("cleanupComplete");
+        });
       } catch (err) {
         socket.emit(
           "log",
           `${currentClient.formatLogTime()} [Error] ${err.message}`
         );
         socket.emit("cleanupComplete");
+      }
+    });
+
+    socket.on("cancelFetching", () => {
+      if (currentClient) {
+        currentClient.stopFetching();
+      }
+    });
+
+    socket.on("cancelDeleting", () => {
+      if (currentClient) {
+        currentClient.stopDeleting();
       }
     });
 

@@ -44,7 +44,13 @@
             <div class="liquid"></div>
           </button>
           <button
-            type="submit"
+            id="startDeletingBtn"
+            class="liquid-button"
+            style="display: none">
+            <span>Start Deleting</span>
+            <div class="liquid"></div>
+          </button>
+          <button
             id="cancelBtn"
             class="liquid-button cancel-btn"
             style="display: none">
@@ -67,12 +73,49 @@
       const form = document.getElementById("cleanupForm");
       const exBtn = document.getElementById("exBtn");
       const cancelBtn = document.getElementById("cancelBtn");
+      const startDeletingBtn = document.getElementById("startDeletingBtn");
 
-      cancelBtn.addEventListener("click", () => {
-        socket.emit("cancelCleanup");
+      function formatTime() {
+        const now = new Date();
+        return `[${now.getHours().toString().padStart(2, "0")}:${now
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}]`;
+      }
 
-        cancelBtn.style.display = "none";
-        exBtn.style.display = "block";
+      function updateButtonStates(state) {
+        switch (state) {
+          case "fetching":
+            exBtn.style.display = "none";
+            cancelBtn.style.display = "block";
+            startDeletingBtn.style.display = "none";
+            break;
+          case "readyToDelete":
+            exBtn.style.display = "none";
+            cancelBtn.style.display = "none";
+            startDeletingBtn.style.display = "block";
+            break;
+          case "deleting":
+            exBtn.style.display = "none";
+            cancelBtn.style.display = "block";
+            startDeletingBtn.style.display = "none";
+            break;
+          case "idle":
+            exBtn.style.display = "block";
+            cancelBtn.style.display = "none";
+            startDeletingBtn.style.display = "none";
+            break;
+        }
+      }
+
+      cancelBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (startDeletingBtn.style.display === "block") {
+          socket.emit("cancelFetching");
+        } else {
+          socket.emit("cancelDeleting");
+        }
+        updateButtonStates("idle");
       });
 
       function resetDropdowns() {
@@ -92,7 +135,7 @@
       tokenInput.addEventListener("input", async () => {
         const token = tokenInput.value.trim();
         if (token) {
-          logToConsole("Logging in to Discord...");
+          logToConsole(`${formatTime()} Logging in to Discord...`);
           socket.emit("initializeClient", { token });
         }
       });
@@ -104,15 +147,27 @@
         }
       });
 
+      startDeletingBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        socket.emit("startDeleting");
+        updateButtonStates("deleting");
+      });
+
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
-
-        cancelBtn.style.display = "block";
-        exBtn.style.display = "none";
-
+        updateButtonStates("fetching");
         socket.emit("startCleanup", data);
+      });
+
+      socket.on("fetchComplete", (data) => {
+        logToConsole(
+          `${formatTime()} [Fetching complete] Found ${
+            data.messageCount
+          } messages`
+        );
+        updateButtonStates("readyToDelete");
       });
 
       socket.on("guilds", (guilds) => {
@@ -126,9 +181,18 @@
       });
 
       socket.on("cleanupComplete", () => {
-        form.querySelector('button[type="submit"]').style.display = "block";
-        cancelBtn.style.display = "none";
-        exBtn.style.display = "block";
+        updateButtonStates("idle");
+        logToConsole(`${formatTime()} [Cleanup complete]`);
+      });
+
+      socket.on("fetchCancelled", () => {
+        updateButtonStates("idle");
+        logToConsole(`${formatTime()} [Fetch cancelled]`);
+      });
+
+      socket.on("deleteCancelled", () => {
+        updateButtonStates("idle");
+        logToConsole(`${formatTime()} [Deletion cancelled]`);
       });
 
       socket.on("channels", (channels) => {
@@ -142,7 +206,9 @@
         });
       });
 
-      socket.on("log", logToConsole);
+      socket.on("log", (message) => {
+        logToConsole(`${formatTime()} ${message}`);
+      });
     </script>
     <script src="/background.js"></script>
   </body>
