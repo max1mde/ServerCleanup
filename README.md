@@ -5,7 +5,9 @@
 
 > [!CAUTION]
 > **Userbots** are against the Discord TOS and can get your Discord account **terminated**!  
-> Use this tool wisely.  
+> Use this tool wisely.
+
+Also this thing is still a bit buggy..
 
 ## Installation
 
